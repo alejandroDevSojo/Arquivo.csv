@@ -1,0 +1,105 @@
+
+documentação
+
+
+Esta documentação fornece uma descrição detalhada de um programa desenvolvido para carregar dados de um arquivo CSV em um banco de dados MariaDB usando PHP e MySQLi. O programa permite importar dados de forma eficiente e automatizada, economizando tempo e esforço em comparação com a inserção manual dos dados.
+Requisitos do Sistema
+
+    Servidor web com suporte a PHP.
+    Servidor de banco de dados MariaDB.
+    Acesso ao banco de dados MariaDB com as permissões adequadas para criar tabelas e carregar dados.
+
+Configuração e Preparação
+Importando o arquivo CSV para o banco de dados
+
+Antes de executar o programa, é necessário importar o arquivo CSV para o banco de dados para criar a tabela e carregar os dados iniciais. Isso pode ser feito usando a instrução LOAD DATA INFILE do MariaDB. Abaixo está um exemplo de como realizar essa importação:
+
+sql
+
+USE leitor_csv;
+LOAD DATA INFILE '/home/tomas/Downloads/Slice-teste-dev-integrador.csv'
+INTO TABLE csv
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(Pedido, Documento_Comprador, Data_de_Entrega, Data_da_Venda, Valor_Venda, Id_do_Produto, Quantidade);
+
+Certifique-se de ajustar o caminho do arquivo CSV para a localização correta em seu sistema.
+Configurando a conexão com o banco de dados
+
+O programa usa uma conexão com o banco de dados MariaDB para interagir com ele. Para estabelecer essa conexão, é fornecido um arquivo de conexão chamado "conexao.php", que contém os detalhes da conexão. Verifique se você configurou corretamente os seguintes valores no arquivo "conexao.php":
+
+    $localhost: O nome ou endereço IP do servidor do banco de dados.
+    $user: O nome de usuário para acessar o banco de dados.
+    $pass: A senha para acessar o banco de dados.
+    $banco: O nome do banco de dados ao qual você deseja se conectar.
+
+Lembre-se de que é importante manter as credenciais de conexão de forma segura e não compartilhá-las no código fonte acessível pelo navegador.
+Uso do Programa
+Carregando dados de um arquivo CSV
+
+Uma vez que o arquivo CSV tenha sido importado para o banco de dados e a conexão tenha sido configurada corretamente, você pode executar o programa para carregar novos dados de um arquivo CSV. Abaixo está o código do programa:
+
+php
+
+<?php
+require "conexion.php";
+
+$filename = '/home/tomas/Downloads/Slice-teste-dev-integrador.csv';
+if (file_exists($filename)) {
+    $query = "LOAD DATA INFILE '$filename'
+    INTO TABLE csv
+    FIELDS TERMINATED BY ','
+    LINES TERMINATED BY '\n'
+    IGNORE 1 ROWS";
+
+    if (mysqli_query($conecta, $query)) {
+        echo "Dados carregados com sucesso.";
+    } else {
+        echo "Erro ao carregar dados: " . mysqli_error($conecta);
+    }
+} else {
+    echo "O arquivo não existe!";
+}
+?>
+
+O programa verifica se o arquivo CSV especificado existe usando a função file_exists(). Em seguida, utiliza a instrução LOAD DATA INFILE do MariaDB para carregar os dados do arquivo CSV na tabela "csv" do banco de dados. Se o carregamento dos dados for bem-sucedido, é exibida a mensagem "Dados carregados com sucesso.". Em caso de erro, é exibida uma mensagem de erro juntamente com a mensagem retornada pelo MariaDB.
+
+Certifique-se de fornecer o caminho correto do arquivo CSV na variável $filename de acordo com o seu ambiente.
+Considerações Adicionais
+Restrições de permissões e configuração
+
+É importante levar em consideração as restrições e configurações de permissões ao trabalhar com arquivos e realizar operações de carregamento de dados no MariaDB. Verifique as permissões do usuário ou processo do MariaDB para acessar e ler arquivos no sistema de arquivos. Além disso, observe a configuração "secure_file_priv" no MariaDB, pois isso pode afetar a capacidade de carregar arquivos usando a instrução LOAD DATA INFILE.
+Depuração e erros comuns
+
+Durante o desenvolvimento do programa, é possível enfrentar desafios e erros comuns, como problemas de sintaxe ou dificuldades com as permissões de arquivos. Certifique-se de revisar cuidadosamente o código e as configurações para evitar erros e realizar testes completos antes de implementar o programa em um ambiente de produção.
+
+
+
+
+Suposições e Ações Adicionais
+
+Durante o desenvolvimento deste programa de leitura de arquivos CSV, foram feitas suposições e tomadas ações adicionais para garantir seu correto funcionamento e superar desafios específicos. A seguir estão detalhadas algumas dessas suposições e ações:
+
+Suposição 1: Carregamento do arquivo CSV a partir do front-end
+
+Assumiu-se que seria necessário permitir que os usuários carregassem arquivos CSV a partir do front-end da aplicação. Essa suposição levou à implementação da lógica para receber e processar o arquivo enviado pelo cliente. No entanto, no código fornecido anteriormente, assumiu-se que o arquivo CSV seria importado diretamente para o banco de dados usando o MariaDB.
+
+Ação 1: Configuração do MariaDB para permitir acesso remoto
+
+Para confirmar que o arquivo CSV foi armazenado corretamente no banco de dados, foi realizada a ação adicional de configurar o MariaDB para permitir acesso remoto. Isso possibilitou a conexão ao banco de dados a partir de uma localização remota e a verificação de que os dados foram carregados com sucesso.
+
+Ação 2: Solução de problemas de permissões e portas
+
+Durante o desenvolvimento, foram encontrados problemas relacionados às permissões de arquivos e à instalação do MariaDB devido à presença prévia do MySQL e à configuração de portas no sistema operacional Parrot OS. Foi necessário investigar e resolver esses problemas para garantir que as permissões estivessem corretas e que o MariaDB funcionasse adequadamente.
+
+Ação 3: Mudança de ferramentas da linha de comando para o PhpMyAdmin
+
+Inicialmente, foi utilizada a linha de comando e a interface do MariaDB para depurar e realizar as operações necessárias. No entanto, foi constatado que o uso do PhpMyAdmin, uma interface gráfica para gerenciar bancos de dados MySQL, facilitou o processo de depuração e proporcionou uma forma mais intuitiva de interagir com o banco de dados.
+
+Ação 4: Depuração de erros de sintaxe
+
+Durante o período de depuração, foram encontrados erros de sintaxe no código. Foi dedicado tempo para revisar cuidadosamente o código, identificar e corrigir esses erros, garantindo que as consultas SQL fossem escritas corretamente e que não houvesse erros de pontuação ou formatos incorretos.
+
+Essas suposições e ações adicionais foram tomadas para adequar o programa aos requisitos e desafios específicos encontrados durante o desenvolvimento. Levar em consideração essas considerações ajudará outros desenvolvedores a entender melhor o contexto e as decisões tomadas no processo de desenvolvimento.
