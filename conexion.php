@@ -1,19 +1,32 @@
 <?php
-session_start();
 
-$localhost = "localhost";
-$user = "root";
-$pass = "";
-$banco = "leitor_csv";
+class DBconexion {
+    private $host = "localhost";
+    private $usuario = "root";
+    private $clave = "";
+    private $db = "Almancenador";
+    public $conexion;
 
-$conecta = mysqli_connect($localhost, $user, $pass, $banco);
-mysqli_set_charset($conecta, "utf8");
+    public function __construct() {
+        $this->conexion = new mysqli($this->host, $this->usuario, $this->clave, $this->db) or die(mysqli_error());
+        $this->conexion->set_charset("utf8");
 
-// Verificar la conexión
-if (!$conecta) {
-    echo "Error de conexión: " . mysqli_connect_error();
-} else {
-    echo "Conexión exitosa a la base de datos";
+       // echo "¡Conexión establecida correctamente!";
+    }
+
+    public function insert($tabla, $datos) {
+        $resultado = $this->conexion->query("INSERT INTO $tabla VALUES(null, $datos)") or die($this->conexion->error);
+        if ($resultado)
+            return true;
+        return false;
+    }
+
+    public function search($tabla, $condicion) {
+        $resultado = $this->conexion->query("SELECT * FROM $tabla WHERE $condicion") or die($this->conexion->error);
+        if ($resultado)
+            return $resultado->fetch_all(MYSQLI_ASSOC);
+        return false;
+    }
 }
 
 ?>
